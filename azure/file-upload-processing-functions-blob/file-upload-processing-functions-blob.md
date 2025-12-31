@@ -70,16 +70,19 @@ graph TB
 
 > **Note**: The Consumption plan includes a monthly free grant of 1 million executions and 400,000 GB-seconds, making this recipe extremely cost-effective for learning and testing scenarios.
 
-## Preparation
 
+
+### Set environment variables for Azure resources
 ```bash
-# Set environment variables for Azure resources
+# Generate unique suffix for resource names
+RANDOM_SUFFIX=$(openssl rand -hex 3)
+
+# Set environment variables
 export RESOURCE_GROUP="rg-file-processing-${RANDOM_SUFFIX}"
 export LOCATION="eastus"
 export SUBSCRIPTION_ID=$(az account show --query id --output tsv)
 
-# Generate unique suffix for resource names
-RANDOM_SUFFIX=$(openssl rand -hex 3)
+
 
 # Set resource names with unique suffix
 export STORAGE_ACCOUNT="stfileproc${RANDOM_SUFFIX}"
@@ -157,7 +160,7 @@ echo "✅ Resource group created: ${RESOURCE_GROUP}"
        --storage-account ${STORAGE_ACCOUNT} \
        --consumption-plan-location ${LOCATION} \
        --runtime node \
-       --runtime-version 18 \
+       --runtime-version 24 \
        --functions-version 4 \
        --tags purpose=file-processing environment=demo
    
@@ -196,23 +199,27 @@ echo "✅ Resource group created: ${RESOURCE_GROUP}"
    # Create directory for function code
    mkdir -p function-code
    cd function-code
-   
-   # Create function.json configuration for blob trigger
+   ```
+
+6. **Create function.json configuration for blob trigger**
+    ```bash
    cat > function.json << 'EOF'
 {
-  "bindings": [
+"bindings": [
     {
-      "name": "myBlob",
-      "type": "blobTrigger",
-      "direction": "in",
-      "path": "uploads/{name}",
-      "connection": "STORAGE_CONNECTION_STRING"
+    "name": "myBlob",
+    "type": "blobTrigger",
+    "direction": "in",
+    "path": "uploads/{name}",
+    "connection": "STORAGE_CONNECTION_STRING"
     }
-  ]
+]
 }
 EOF
-   
-   # Create JavaScript function code for file processing
+    ```
+
+7. **Create JavaScript function code for file processing**
+    ```bash
    cat > index.js << 'EOF'
 module.exports = async function (context, myBlob) {
     const fileName = context.bindingData.name;
@@ -238,12 +245,12 @@ module.exports = async function (context, myBlob) {
     context.log(`🎉 File processing workflow completed for: ${fileName}`);
 };
 EOF
-   
+   ```
    echo "✅ Function code created successfully"
    cd ..
-   ```
+   
 
-6. **Deploy Function to Azure**:
+8. **Deploy Function to Azure**:
 
    Function deployment transfers the trigger configuration and processing logic to Azure's serverless infrastructure. Once deployed, the function automatically monitors the specified blob container and executes the processing workflow whenever new files are uploaded.
 
