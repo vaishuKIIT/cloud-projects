@@ -202,7 +202,7 @@ resource "azurerm_role_assignment" "current_user_blob_contributor" {
   principal_id = data.azurerm_client_config.current.object_id
   
   # Specify principal type for ABAC compatibility
-  principal_type = "ServicePrincipal"
+  principal_type = "User"
 
   # Add descriptive information for audit purposes
   description = "Storage Blob Data Contributor access for Terraform deployment user"

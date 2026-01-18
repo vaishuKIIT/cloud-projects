@@ -101,12 +101,12 @@ variable "storage_account_access_tier" {
 variable "cdn_sku" {
   description = "CDN profile SKU/pricing tier"
   type        = string
-  default     = "Standard_Microsoft"
+  default     = "Standard_AzureFrontDoor"
   
   validation {
     condition = contains([
       "Standard_Akamai", "Standard_Microsoft", "Standard_Verizon",
-      "Premium_Verizon", "Standard_ChinaCdn", "Standard_955BandWidth_ChinaCdn"
+      "Premium_Verizon", "Standard_ChinaCdn", "Standard_955BandWidth_ChinaCdn","Standard_AzureFrontDoor"
     ], var.cdn_sku)
     error_message = "CDN SKU must be a valid Azure CDN pricing tier."
   }

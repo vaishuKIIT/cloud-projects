@@ -30,8 +30,8 @@ provider "azurerm" {
     # Storage provider features for enhanced blob storage management
     storage {
       # Prevent accidental deletion of storage containers and blobs
-      purge_soft_delete_on_destroy    = false
-      recover_soft_deleted_key_vaults = false
+      # purge_soft_delete_on_destroy    = false
+      # recover_soft_deleted_key_vaults = false
     }
 
     # Resource group provider features
@@ -40,7 +40,7 @@ provider "azurerm" {
       prevent_deletion_if_contains_resources = false
     }
   }
-
+  subscription_id = "333e3c5a-b7cf-41ff-9a88-f367c6754474"
   # Use Azure CLI authentication by default
   # Alternatively, service principal authentication can be configured
   # using environment variables or configuration blocks

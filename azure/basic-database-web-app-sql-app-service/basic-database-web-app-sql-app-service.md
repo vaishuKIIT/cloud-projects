@@ -148,7 +148,7 @@ echo "✅ Resource group created: ${RESOURCE_GROUP}"
 
    ```bash
    # Create a simple table structure for demonstration
-   az sql query \
+   az sql db query \
        --server ${SQL_SERVER_NAME} \
        --database ${SQL_DATABASE_NAME} \
        --auth-type SqlPassword \
@@ -183,7 +183,7 @@ echo "✅ Resource group created: ${RESOURCE_GROUP}"
        --name ${APP_SERVICE_PLAN} \
        --resource-group ${RESOURCE_GROUP} \
        --location ${LOCATION} \
-       --sku B1 \
+       --sku B1\
        --is-linux false
    
    echo "✅ App Service Plan created: ${APP_SERVICE_PLAN}"

@@ -19,10 +19,10 @@ terraform {
 # Configure the Azure Provider
 provider "azurerm" {
   features {
-    # Enable enhanced storage account features
-    storage {
-      purge_soft_deleted_blobs_on_destroy = true
-    }
+  #   # Enable enhanced storage account features
+  #   # storage {
+  #   #   purge_soft_deleted_blobs_on_destroy = true
+  #   # }
     
     # Enable resource group cleanup features
     resource_group {

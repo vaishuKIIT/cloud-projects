@@ -54,17 +54,17 @@ output "static_website_host" {
 # CDN Information
 output "cdn_profile_name" {
   description = "Name of the CDN profile"
-  value       = azurerm_cdn_profile.main.name
+  value       = azurerm_cdn_frontdoor_profile.main.name
 }
 
 output "cdn_profile_id" {
   description = "Full resource ID of the CDN profile"
-  value       = azurerm_cdn_profile.main.id
+  value       = azurerm_cdn_frontdoor_profile.main.id
 }
 
 output "cdn_profile_sku" {
   description = "SKU/pricing tier of the CDN profile"
-  value       = azurerm_cdn_profile.main.sku
+  value       = azurerm_cdn_frontdoor_profile.main.sku_name
 }
 
 # CDN Endpoint Information
@@ -80,12 +80,12 @@ output "cdn_endpoint_id" {
 
 output "cdn_endpoint_url" {
   description = "Primary URL for accessing content via CDN"
-  value       = "https://${azurerm_cdn_endpoint.main.host_name}"
+  value       = "https://${azurerm_cdn_endpoint.main.fqdn}"
 }
 
 output "cdn_endpoint_hostname" {
   description = "Hostname of the CDN endpoint"
-  value       = azurerm_cdn_endpoint.main.host_name
+  value       = azurerm_cdn_endpoint.main.fqdn
 }
 
 output "cdn_endpoint_origin_host_header" {
@@ -106,7 +106,7 @@ output "optimization_type" {
 
 output "query_string_caching_behavior" {
   description = "Query string caching behavior for the CDN endpoint"
-  value       = azurerm_cdn_endpoint.main.query_string_caching_behaviour
+  value       = var.query_string_caching_behavior
 }
 
 # Website Configuration
@@ -131,8 +131,8 @@ output "testing_commands" {
   description = "Commands to test the deployed infrastructure"
   value = {
     test_storage_direct = "curl -I ${azurerm_storage_account.main.primary_web_endpoint}"
-    test_cdn_endpoint   = "curl -I https://${azurerm_cdn_endpoint.main.host_name}"
-    test_compression    = "curl -H 'Accept-Encoding: gzip' -I https://${azurerm_cdn_endpoint.main.host_name}"
+    test_cdn_endpoint   = "curl -I https://${azurerm_cdn_endpoint.main.fqdn}"
+    test_compression    = "curl -H 'Accept-Encoding: gzip' -I https://${azurerm_cdn_endpoint.main.fqdn}"
   }
 }
 
@@ -154,8 +154,8 @@ output "deployment_summary" {
       estimated_monthly_cost = "~$1-3 USD (depending on storage and bandwidth usage)"
     }
     cdn_profile = {
-      name = azurerm_cdn_profile.main.name
-      sku = azurerm_cdn_profile.main.sku
+      name = azurerm_cdn_frontdoor_profile.main.name
+      sku = azurerm_cdn_frontdoor_profile.main.sku_name
       estimated_monthly_cost = "~$1-2 USD (depending on data transfer and requests)"
     }
     total_estimated_monthly_cost = "~$2-5 USD"
@@ -178,7 +178,7 @@ output "next_steps" {
   description = "Recommended next steps after deployment"
   value = [
     "Test the static website: ${azurerm_storage_account.main.primary_web_endpoint}",
-    "Test the CDN endpoint: https://${azurerm_cdn_endpoint.main.host_name}",
+    "Test the CDN endpoint: https://${azurerm_cdn_endpoint.main.fqdn}",
     "Upload your own content to the '$web' container in the storage account",
     "Configure a custom domain for production use",
     "Set up monitoring and alerts for performance tracking",

@@ -282,7 +282,9 @@ EOF
 
    # Extract origin hostname from website URL for CDN configuration
    ORIGIN_HOSTNAME=$(echo ${WEBSITE_URL} | sed 's|https://||' | sed 's|/||')
+    ```
 
+    ```bash
    # Create CDN endpoint pointing to static website
    az cdn endpoint create \
        --name ${CDN_ENDPOINT} \
