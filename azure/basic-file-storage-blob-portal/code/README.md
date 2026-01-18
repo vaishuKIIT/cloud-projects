@@ -62,13 +62,13 @@ terraform init
 terraform plan \
     -var="resource_group_name=rg-storage-demo" \
     -var="location=eastus" \
-    -var="storage_account_prefix=mystorageacct"
+    -var="storage_account_name=mystorageacct"
 
 # Apply the configuration
 terraform apply \
     -var="resource_group_name=rg-storage-demo" \
     -var="location=eastus" \
-    -var="storage_account_prefix=mystorageacct"
+    -var="storage_account_name=mystorageacct"
 
 # View outputs
 terraform output
@@ -111,7 +111,7 @@ Customize your deployment by modifying variables in `terraform/variables.tf` or 
 terraform apply \
     -var="resource_group_name=my-rg" \
     -var="location=westus2" \
-    -var="storage_account_prefix=mycompany" \
+    -var="storage_account_name=mycompany" \
     -var="sku_name=Standard_GRS" \
     -var="access_tier=Cool"
 ```
@@ -206,7 +206,7 @@ cd terraform/
 terraform destroy \
     -var="resource_group_name=rg-storage-demo" \
     -var="location=eastus" \
-    -var="storage_account_prefix=mystorageacct"
+    -var="storage_account_account=mystorageacct"
 ```
 
 ### Using Bash Scripts

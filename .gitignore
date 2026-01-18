@@ -12,3 +12,8 @@ __pycache__/
 
 # SEO planning document
 SEO.md
+
+# Add this line to your .gitignore
+.terraform/
+*.tfstate
+*.tfstate.backup

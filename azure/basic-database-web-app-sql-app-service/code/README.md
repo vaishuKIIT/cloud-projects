@@ -192,7 +192,7 @@ cd terraform/
 
 # Destroy all resources
 terraform destroy -var="sql_admin_password=SecurePass123!" \
-                  -var="location=eastus"
+                  -var="location=westus"
 ```
 
 ### Using Bash Scripts

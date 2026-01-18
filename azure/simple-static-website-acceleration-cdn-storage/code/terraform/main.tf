@@ -43,13 +43,13 @@ resource "azurerm_storage_account" "main" {
   shared_access_key_enabled        = true
 
   # Cross-Origin Resource Sharing (CORS) rules for web applications
-  cors_rule {
-    allowed_headers    = ["*"]
-    allowed_methods    = ["GET", "HEAD", "OPTIONS"]
-    allowed_origins    = ["*"]
-    exposed_headers    = ["*"]
-    max_age_in_seconds = 3600
-  }
+  # cors_rule {
+  #   allowed_headers    = ["*"]
+  #   allowed_methods    = ["GET", "HEAD", "OPTIONS"]
+  #   allowed_origins    = ["*"]
+  #   exposed_headers    = ["*"]
+  #   max_age_in_seconds = 3600
+  # }
 
   tags = var.tags
 }
@@ -113,18 +113,17 @@ resource "azurerm_storage_blob" "error_404_html" {
 }
 
 # Create CDN Profile for global content delivery
-resource "azurerm_cdn_profile" "main" {
+resource "azurerm_cdn_frontdoor_profile" "main" {
   name                = "${var.cdn_profile_name_prefix}-${random_string.suffix.result}"
-  location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
-  sku                 = var.cdn_sku
+  sku_name                = var.cdn_sku
   tags                = var.tags
 }
 
 # Create CDN Endpoint pointing to the static website
 resource "azurerm_cdn_endpoint" "main" {
   name                = "${var.cdn_endpoint_name_prefix}-${random_string.suffix.result}"
-  profile_name        = azurerm_cdn_profile.main.name
+  profile_name        = azurerm_cdn_frontdoor_profile.main.name
   location            = azurerm_resource_group.main.location
   resource_group_name = azurerm_resource_group.main.name
 
@@ -150,7 +149,15 @@ resource "azurerm_cdn_endpoint" "main" {
   ]
 
   # Configure caching behavior
-  query_string_caching_behaviour = var.query_string_caching_behavior
+  # query_string_caching_behaviour = var.query_string_caching_behavior
+  # delivery_rule {
+  #   name  = "query_string_caching_behaviour"
+  #   order = 1
+
+  #   cache_key_query_string_action {
+  #     behavior = var.query_string_caching_behavior
+  #   }
+  # }
   optimization_type             = var.optimization_type
 
   # Configure origin host header to match storage account
@@ -162,21 +169,21 @@ resource "azurerm_cdn_endpoint" "main" {
     order = 1
 
     # Match CSS, JS, and image files
-    conditions {
-      url_file_extension_condition {
-        operator      = "Equal"
-        match_values  = ["css", "js", "png", "jpg", "jpeg", "gif", "svg", "ico", "woff", "woff2", "ttf", "eot"]
-        transforms    = ["Lowercase"]
-      }
-    }
+    # conditions {
+    #   url_file_extension_condition {
+    #     operator      = "Equal"
+    #     match_values  = ["css", "js", "png", "jpg", "jpeg", "gif", "svg", "ico", "woff", "woff2", "ttf", "eot"]
+    #     transforms    = ["Lowercase"]
+    #   }
+    # }
 
     # Cache for 30 days
-    actions {
-      cache_expiration_action {
-        behavior = "Override"
-        duration = "30.00:00:00"
-      }
-    }
+    # actions {
+    #   cache_expiration_action {
+    #     behavior = "Override"
+    #     duration = "30.00:00:00"
+    #   }
+    # }
   }
 
   delivery_rule {
@@ -184,69 +191,29 @@ resource "azurerm_cdn_endpoint" "main" {
     order = 2
 
     # Match HTML files
-    conditions {
-      url_file_extension_condition {
-        operator     = "Equal"
-        match_values = ["html", "htm"]
-        transforms   = ["Lowercase"]
-      }
+    # conditions {
+    #   url_file_extension_condition {
+    #     operator     = "Equal"
+    #     match_values = ["html", "htm"]
+    #     transforms   = ["Lowercase"]
+    #   }
     }
 
     # Cache for 1 hour
-    actions {
-      cache_expiration_action {
-        behavior = "Override"
-        duration = "01:00:00"
-      }
-    }
-  }
+    # actions {
+    #   cache_expiration_action {
+    #     behavior = "Override"
+    #     duration = "01:00:00"
+    #   }
+    # }
+  # }
 
   tags = var.tags
 
   depends_on = [azurerm_storage_account.main]
 }
 
-# Create template files for sample content
-resource "local_file" "index_html_template" {
-  count    = var.create_sample_content ? 1 : 0
-  filename = "${path.module}/templates/index.html"
-  content = templatefile("${path.module}/sample-content/index.html.tpl", {})
-
-  provisioner "local-exec" {
-    command = "mkdir -p ${path.module}/templates"
-  }
-}
-
-resource "local_file" "styles_css_template" {
-  count    = var.create_sample_content ? 1 : 0
-  filename = "${path.module}/templates/styles.css"
-  content  = file("${path.module}/sample-content/styles.css")
-
-  provisioner "local-exec" {
-    command = "mkdir -p ${path.module}/templates"
-  }
-}
-
-resource "local_file" "app_js_template" {
-  count    = var.create_sample_content ? 1 : 0
-  filename = "${path.module}/templates/app.js"
-  content  = file("${path.module}/sample-content/app.js")
-
-  provisioner "local-exec" {
-    command = "mkdir -p ${path.module}/templates"
-  }
-}
-
-resource "local_file" "error_404_html_template" {
-  count    = var.create_sample_content ? 1 : 0
-  filename = "${path.module}/templates/404.html"
-  content = templatefile("${path.module}/sample-content/404.html.tpl", {})
-
-  provisioner "local-exec" {
-    command = "mkdir -p ${path.module}/templates"
-  }
-}
-
+/*
 # Create sample content directory and files
 resource "local_file" "sample_index_html" {
   count    = var.create_sample_content ? 1 : 0
@@ -355,3 +322,45 @@ EOT
     command = "mkdir -p ${path.module}/sample-content"
   }
 }
+
+# Create template files for sample content
+resource "local_file" "index_html_template" {
+  count    = var.create_sample_content ? 1 : 0
+  filename = "${path.module}/templates/index.html"
+  content = templatefile("${path.module}/sample-content/index.html.tpl", {})
+
+  provisioner "local-exec" {
+    command = "mkdir -p ${path.module}/templates"
+  }
+}
+
+resource "local_file" "styles_css_template" {
+  count    = var.create_sample_content ? 1 : 0
+  filename = "${path.module}/templates/styles.css"
+  content  = file("${path.module}/sample-content/styles.css")
+
+  provisioner "local-exec" {
+    command = "mkdir -p ${path.module}/templates"
+  }
+}
+
+resource "local_file" "app_js_template" {
+  count    = var.create_sample_content ? 1 : 0
+  filename = "${path.module}/templates/app.js"
+  content  = file("${path.module}/sample-content/app.js")
+
+  provisioner "local-exec" {
+    command = "mkdir -p ${path.module}/templates"
+  }
+}
+
+resource "local_file" "error_404_html_template" {
+  count    = var.create_sample_content ? 1 : 0
+  filename = "${path.module}/templates/404.html"
+  content = templatefile("${path.module}/sample-content/404.html.tpl", {})
+
+  provisioner "local-exec" {
+    command = "mkdir -p ${path.module}/templates"
+  }
+}
+*/
